@@ -1,0 +1,6 @@
+*.config.js
+*.config.ts
+tsconfig.app.json
+tsconfig.node.json
+tsconfig.vitest.json
+tsconfig.json
