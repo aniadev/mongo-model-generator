@@ -98,7 +98,7 @@
       </div>
     </div>
     <div class="viewer w-[580px] flex relative">
-      <el-button class="absolute right-1 top-1">Copy</el-button>
+      <el-button class="absolute right-1 top-1" @click="onCopy">Copy</el-button>
       <pre class="w-full language-typescript !m-0">
         <code v-html="formattedCode" class="language-typescript prose"></code>
       </pre>
@@ -112,6 +112,8 @@
 import { ref, onMounted } from 'vue'
 // import Vue3DraggableResizable, { DraggableContainer } from 'vue3-draggable-resizable'
 // import 'vue3-draggable-resizable/dist/Vue3DraggableResizable.css'
+
+import { ElMessage } from 'element-plus'
 
 import { CircleClose } from '@element-plus/icons-vue'
 
@@ -204,21 +206,16 @@ function generateField(item: IModelItem): string {
 }
 
 function generator(): void {
-  output.value = `
-  @Schema({
-    timestamps: ${schemaOptions.value.timestamps ? 'true' : 'false'}${
+  output.value = `\n@Schema({\n\ttimestamps: ${schemaOptions.value.timestamps ? 'true' : 'false'}${
     schemaOptions.value.collection ? `,\n\tcollection: '${schemaOptions.value.collection}'` : ''
-  }
-  })
-
-  export class SchemaClass { 
+  }\n})\n\nexport class SchemaClass { 
   `
 
   tableData.value.forEach((row) => {
     output.value += generateField(row)
   })
 
-  output.value += `\n  }`
+  output.value += `\n}`
 
   formattedCode.value = Prism.highlight(output.value, Prism.languages.typescript, 'typescript')
 }
@@ -245,6 +242,20 @@ function clearTableData(): void {
       default: ''
     }
   ]
+}
+
+function onCopy(): void {
+  navigator.clipboard
+    .writeText(output.value)
+    .then(() => {
+      ElMessage({
+        message: 'Copied',
+        type: 'success'
+      })
+    })
+    .catch((error) => {
+      console.error('Error copying text to clipboard:', error)
+    })
 }
 </script>
 
